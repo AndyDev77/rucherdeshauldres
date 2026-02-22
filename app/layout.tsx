@@ -15,9 +15,6 @@ export const metadata: Metadata = {
   title: "Rucher des Hauldres - Miel d'Exception",
   description:
     "Miel artisanal français, récolté avec passion et respect des abeilles.",
-  verification: {
-    google: "google79cb2d0af6a58b4e.html", // 🔥 remplace par le vrai code donné par Google
-  },
 };
 
 export default function RootLayout({
