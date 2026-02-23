@@ -144,9 +144,9 @@ export default function Hero() {
                             {/* Contenu */}
                             <div className="relative h-full flex items-center justify-center px-4">
                                 <div className="text-center max-w-5xl animate-fade-in">
-                                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6">
+                                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6">
                                         {slide.title}
-                                    </h1>
+                                    </h2>
                                     <p className="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto">
                                         {slide.subtitle}
                                     </p>

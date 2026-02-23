@@ -12,9 +12,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Rucher des Hauldres - Miel d'Exception",
+  title: "Rucher des Hauldres | Miel artisanal en Seine-et-Marne (77)",
   description:
-    "Miel artisanal français, récolté avec passion et respect des abeilles.",
+    "Miel artisanal français récolté en Seine-et-Marne (77). Apiculture locale, respect des abeilles, produits naturels du rucher.",
 };
 
 export default function RootLayout({

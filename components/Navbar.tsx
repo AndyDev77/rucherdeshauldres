@@ -11,7 +11,6 @@ const NAV_ITEMS = [
     { label: "PROPOS", href: "#propos" },
     { label: "MIELS", href: "#miels" },
     { label: "TRAVAIL", href: "#travail" },
-    { label: "GALERIE", href: "#galerie" },
 ];
 
 export default function Navbar() {
