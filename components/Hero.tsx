@@ -1,13 +1,11 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import type {EmblaCarouselType} from "embla-carousel";
+import type { EmblaCarouselType } from "embla-carousel";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "./ui/button";
-
 
 type Slide = {
     image: string;
@@ -34,8 +32,6 @@ const AUTOPLAY_INTERVAL = 15000; // 15 secondes
 
 export default function Hero() {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-    const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
-    const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
     const autoplayRef = useRef<number | null>(null);
@@ -62,17 +58,8 @@ export default function Hero() {
         [prefersReducedMotion]
     );
 
-
-
-    const scrollPrev = useCallback(
-        () => emblaApi && emblaApi.scrollPrev(),
-        [emblaApi]
-    );
-    const scrollNext = useCallback(
-        () => emblaApi && emblaApi.scrollNext(),
-        [emblaApi]
-    );
-
+    const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+    const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
     const scrollTo = useCallback(
         (index: number) => emblaApi && emblaApi.scrollTo(index),
         [emblaApi]
@@ -80,22 +67,21 @@ export default function Hero() {
 
     const onSelect = useCallback(() => {
         if (!emblaApi) return;
-        setPrevBtnEnabled(emblaApi.canScrollPrev());
-        setNextBtnEnabled(emblaApi.canScrollNext());
         setSelectedIndex(emblaApi.selectedScrollSnap());
     }, [emblaApi]);
 
     useEffect(() => {
         if (!emblaApi) return;
 
-        onSelect();
         emblaApi.on("select", onSelect);
         emblaApi.on("reInit", onSelect);
 
-        // Autoplay initial
+        // Synchronisation initiale différée d'une frame : évite la cascade
+        // de rendus d'un setState synchrone dans l'effet.
+        const syncFrame = requestAnimationFrame(onSelect);
+
         startAutoplay(emblaApi);
 
-        // Stop / restart autoplay en cas d'interaction
         const stopAndRestart = () => {
             clearAutoplay();
             startAutoplay(emblaApi);
@@ -105,6 +91,7 @@ export default function Hero() {
         emblaApi.on("scroll", stopAndRestart);
 
         return () => {
+            cancelAnimationFrame(syncFrame);
             clearAutoplay();
             emblaApi.off("select", onSelect);
             emblaApi.off("reInit", onSelect);
@@ -115,7 +102,7 @@ export default function Hero() {
 
     return (
         <section
-            className="relative h-screen overflow-hidden"
+            className="relative h-[100svh] overflow-hidden"
             aria-roledescription="carousel"
             aria-label="Mise en avant du rucher des Hauldres"
         >
@@ -129,7 +116,7 @@ export default function Hero() {
                             aria-roledescription="slide"
                             aria-label={`${index + 1} / ${SLIDES.length}`}
                         >
-                            {/* Image + overlay */}
+                            {/* Image + voile chaleureux */}
                             <div className="absolute inset-0">
                                 <Image
                                     src={slide.image}
@@ -137,30 +124,42 @@ export default function Hero() {
                                     fill
                                     className="object-cover"
                                     priority={index === 0}
+                                    sizes="100vw"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
+                                <div className="absolute inset-0 bg-gradient-to-b from-bark/75 via-bark/45 to-bark/85" />
+                                <div className="absolute inset-0 bg-honey/10 mix-blend-overlay" />
                             </div>
 
                             {/* Contenu */}
-                            <div className="relative h-full flex items-center justify-center px-4">
-                                <div className="text-center max-w-5xl animate-fade-in">
-                                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6">
+                            <div className="relative h-full flex items-center justify-center px-6">
+                                <div className="text-center max-w-4xl">
+                                    <p className="text-honey-light tracking-[0.3em] text-xs sm:text-sm uppercase mb-6">
+                                        Apiculteur en Seine-et-Marne
+                                    </p>
+                                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-cream leading-[1.15] mb-6 text-balance">
                                         {slide.title}
                                     </h2>
-                                    <p className="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto">
+                                    <p className="text-base sm:text-lg text-cream/85 mb-10 max-w-2xl mx-auto leading-relaxed">
                                         {slide.subtitle}
                                     </p>
-                                    <Link href="#miels">
-                                        <Button
-                                            className="px-8 py-3 rounded-full text-base md:text-lg font-medium
-                                           bg-white/95 text-black shadow-lg shadow-black/40
-                                           hover:bg-white hover:shadow-amber-400/40
-                                           transition-transform duration-300 hover:scale-105 border border-white/60"
+
+                                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                                        <Link
+                                            href="#miels"
+                                            className="px-8 py-3.5 rounded-full bg-honey text-cream font-medium
+                                                       shadow-lg shadow-bark/40 hover:bg-honey-light hover:text-bark
+                                                       transition-all duration-300 hover:scale-105"
                                         >
                                             Voir nos miels
-                                        </Button>
-                                    </Link>
-
+                                        </Link>
+                                        <Link
+                                            href="#contact"
+                                            className="px-8 py-3.5 rounded-full border border-cream/40 text-cream
+                                                       hover:bg-cream hover:text-bark transition-all duration-300"
+                                        >
+                                            Commander
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -168,36 +167,33 @@ export default function Hero() {
                 </div>
             </div>
 
-            {/* Flèches */}
+            {/* Flèches — masquées sur mobile, où le glissement et les points suffisent */}
             <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+                className="hidden md:flex absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full border border-cream/30 text-cream/80 hover:bg-cream hover:text-bark transition-colors"
                 onClick={scrollPrev}
-                disabled={!prevBtnEnabled}
                 aria-label="Slide précédent"
             >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
             </button>
 
             <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+                className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full border border-cream/30 text-cream/80 hover:bg-cream hover:text-bark transition-colors"
                 onClick={scrollNext}
-                disabled={!nextBtnEnabled}
                 aria-label="Slide suivant"
             >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
             </button>
 
-            {/* Dots */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
+            {/* Points */}
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2.5">
                 {SLIDES.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => scrollTo(index)}
                         aria-label={`Aller au slide ${index + 1}`}
-                        className={`h-2.5 rounded-full transition-all ${
-                            index === selectedIndex
-                                ? "w-6 bg-text-50"
-                                : "w-2.5 bg-white/60 hover:bg-white"
+                        aria-current={index === selectedIndex}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                            index === selectedIndex ? "w-8 bg-honey-light" : "w-4 bg-cream/50 hover:bg-cream/80"
                         }`}
                     />
                 ))}

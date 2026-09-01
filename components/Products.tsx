@@ -4,8 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { Badge } from "./ui/badge";
-import { Card } from "./ui/card";
+import Reveal from "./Reveal";
 
 const products = [
     {
@@ -46,9 +45,15 @@ const products = [
         price: "10.00",
         image: "/images/miels/miel-foret.png",
         description: "Récolte de miel à Bréviande. Pot de 500 g.",
-        stock: false,
+        stock: true,
     },
 ];
+
+export function selectProduct(name: string) {
+    const objet = `Commande : ${name}`;
+    sessionStorage.setItem("produitInteret", objet);
+    window.dispatchEvent(new CustomEvent("produit-interet", { detail: objet }));
+}
 
 export default function Products() {
     const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -73,101 +78,127 @@ export default function Products() {
 
     useEffect(() => {
         if (!emblaApi) return;
-        onSelect();
+
         emblaApi.on("select", onSelect);
         emblaApi.on("reInit", onSelect);
+
+        // Synchronisation initiale différée d'une frame : évite la cascade
+        // de rendus d'un setState synchrone dans l'effet.
+        const syncFrame = requestAnimationFrame(onSelect);
+
+        return () => {
+            cancelAnimationFrame(syncFrame);
+            emblaApi.off("select", onSelect);
+            emblaApi.off("reInit", onSelect);
+        };
     }, [emblaApi, onSelect]);
 
     return (
-        <section className="py-24 bg-neutral-900" id="miels">
+        <section className="py-24 sm:py-28 bg-cream" id="miels">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl font-serif text-white mb-4">Notre Collection de Miels</h2>
-                    <p className="text-lg text-white/80 max-w-3xl mx-auto">
-                        Les tarifs sont sans frais de port. <br /> Toutes commandes sont à retirer au rucher des
-                        hauldres;
-                    </p>
-                    <div className="w-20 h-1 bg-orange-200/60 rounded-full mx-auto mt-6" />
-                </div>
+                <Reveal>
+                    <div className="text-center mb-14">
+                        <p className="text-honey tracking-[0.25em] text-xs uppercase mb-4">Nos miels</p>
+                        <h2 className="text-3xl sm:text-4xl font-serif text-ink mb-5">
+                            Notre collection de miels
+                        </h2>
+                        <p className="text-ink-soft max-w-2xl mx-auto leading-relaxed">
+                            Tarifs sans frais de port. Toutes les commandes sont à retirer directement au
+                            rucher des Hauldres.
+                        </p>
+                        <div className="rule-honey mx-auto mt-7" />
+                    </div>
+                </Reveal>
 
-                <div className="relative">
-                    <div className="overflow-hidden" ref={emblaRef}>
-                        <div className="flex gap-8">
-                            {products.map((product) => (
-                                <div
-                                    key={product.id}
-                                    className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-16px)] lg:flex-[0_0_calc(33.33%-21.33px)]"
-                                >
-                                    <Card
-                                        className={`group bg-neutral-900 border-none overflow-hidden h-full flex flex-col ${
-                                            !product.stock ? "opacity-75" : ""
-                                        }`}
+                <Reveal delay={120}>
+                    <div className="relative">
+                        <div className="overflow-hidden" ref={emblaRef}>
+                            <div className="flex gap-6 md:gap-8">
+                                {products.map((product) => (
+                                    <article
+                                        key={product.id}
+                                        className="flex-[0_0_100%] min-w-0 md:flex-[0_0_calc(50%-16px)] lg:flex-[0_0_calc(33.33%-21.33px)]"
                                     >
-                                        <div className="relative h-72 bg-neutral-800">
-                                            <div className="absolute inset-0 flex items-center justify-center">
+                                        <div
+                                            className={`group h-full flex flex-col rounded-2xl bg-white border border-sand-deep/60 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-bark/10 hover:-translate-y-1 ${
+                                                !product.stock ? "opacity-80" : ""
+                                            }`}
+                                        >
+                                            <div className="relative h-64 bg-sand/60">
                                                 <Image
                                                     src={product.image}
                                                     alt={product.name}
                                                     fill
-                                                    className={`object-contain p-4 transition-transform duration-300 ${
+                                                    className={`object-contain p-6 transition-transform duration-500 ${
                                                         product.stock ? "group-hover:scale-105" : "grayscale"
                                                     }`}
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                 />
-                                            </div>
-                                            <div className="absolute top-4 right-4 z-10">
-                                                <Badge
-                                                    className={
-                                                        product.stock ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                                                    }
+                                                <span
+                                                    className={`absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-xs font-medium ${
+                                                        product.stock
+                                                            ? "bg-honey/15 text-honey"
+                                                            : "bg-ink/10 text-ink-soft"
+                                                    }`}
                                                 >
                                                     {product.stock ? "En stock" : "Rupture"}
-                                                </Badge>
+                                                </span>
+                                            </div>
+
+                                            <div className="p-6 flex flex-col flex-grow">
+                                                <div className="flex-grow">
+                                                    <h3 className="text-xl font-serif text-ink mb-2">
+                                                        {product.name}
+                                                    </h3>
+                                                    <p className="text-sm text-ink-soft leading-relaxed">
+                                                        {product.description}
+                                                    </p>
+                                                </div>
+
+                                                <div className="mt-6 pt-5 border-t border-sand-deep/70 flex items-center justify-between">
+                                                    <span className="text-2xl font-serif text-honey">
+                                                        {product.price}€
+                                                    </span>
+                                                    {product.stock ? (
+                                                        <a
+                                                            href="#contact"
+                                                            onClick={() => selectProduct(product.name)}
+                                                            className="rounded-full px-5 py-2.5 text-sm font-medium bg-bark text-cream hover:bg-honey transition-colors"
+                                                        >
+                                                            Commander
+                                                        </a>
+                                                    ) : (
+                                                        <span className="rounded-full px-5 py-2.5 text-sm font-medium bg-sand-deep text-ink-soft cursor-not-allowed">
+                                                            Indisponible
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="p-6 flex flex-col flex-grow">
-                                            <div className="flex-grow">
-                                                <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
-                                                <p className="text-white/60">{product.description}</p>
-                                            </div>
-                                            <div className="mt-6 pt-4 border-t border-neutral-800 flex items-center justify-between">
-                                                <span className="text-2xl font-bold text-orange-200">{product.price}€</span>
-                                                <a href="#contact">
-                                                    <button
-                                                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                                                            product.stock
-                                                                ? "bg-orange-200 text-black hover:bg-text-50"
-                                                                : "bg-neutral-700 text-neutral-400 cursor-not-allowed"
-                                                        }`}
-                                                        disabled={!product.stock}
-                                                    >
-                                                        {product.stock ? "Commander" : "Indisponible"}
-                                                    </button>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            ))}
+                                    </article>
+                                ))}
+                            </div>
                         </div>
+
+                        <button
+                            className="absolute -left-3 lg:-left-5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-white text-ink shadow-lg shadow-bark/10 hover:bg-honey hover:text-cream transition-colors disabled:opacity-0 disabled:pointer-events-none z-10"
+                            onClick={scrollPrev}
+                            disabled={!prevBtnEnabled}
+                            aria-label="Miels précédents"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+
+                        <button
+                            className="absolute -right-3 lg:-right-5 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-white text-ink shadow-lg shadow-bark/10 hover:bg-honey hover:text-cream transition-colors disabled:opacity-0 disabled:pointer-events-none z-10"
+                            onClick={scrollNext}
+                            disabled={!nextBtnEnabled}
+                            aria-label="Miels suivants"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </button>
                     </div>
-
-                    <button
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-                        onClick={scrollPrev}
-                        disabled={!prevBtnEnabled}
-                    >
-                        <ChevronLeft className="w-6 h-6" />
-                    </button>
-
-                    <button
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-                        onClick={scrollNext}
-                        disabled={!nextBtnEnabled}
-                    >
-                        <ChevronRight className="w-6 h-6" />
-                    </button>
-                </div>
+                </Reveal>
             </div>
         </section>
     );

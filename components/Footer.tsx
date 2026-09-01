@@ -1,50 +1,49 @@
-"use client";
-
-import { Facebook, Mail, MapPin, Phone, PhoneForwarded } from "lucide-react";
+import { Facebook, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const NAV_LINKS = [
+    { label: "Accueil", href: "/" },
+    { label: "À propos", href: "/#propos" },
+    { label: "Nos miels", href: "/#miels" },
+    { label: "Notre travail", href: "/#travail" },
+    { label: "Galerie", href: "/galerie" },
+];
+
 export default function Footer() {
     return (
-        <footer className="bg-black text-white">
+        <footer className="bg-bark text-cream">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-                    {/* Logo et Description */}
-                    <div className="space-y-6">
-                        <Link href="/" className="flex items-center space-x-3 group">
-                            <div>
-                                <Image
-                                    src="/images/logo/logo-honey.png"
-                                    alt="Rucher des Hauldres Logo"
-                                    width={200}
-                                    height={50}
-                                    className="transition-transform duration-300 group-hover:scale-110"
-                                />
-                            </div>
+                    {/* Logo et description */}
+                    <div className="space-y-5">
+                        <Link href="/" className="inline-block group" aria-label="Rucher des Hauldres, accueil">
+                            <Image
+                                src="/images/logo/logo-honey.png"
+                                alt="Rucher des Hauldres"
+                                width={200}
+                                height={50}
+                                style={{ height: "auto" }}
+                                className="w-[180px] transition-transform duration-500 group-hover:scale-105"
+                            />
                         </Link>
-                        <p className="text-white/60 text-sm">
-                            Producteur de miel artisanal depuis 2010, nous vous proposons des miels naturels, non
-                            chauffés et non agités, issus de nos ruches en Seine-et-Marne.
+                        <p className="text-cream/60 text-sm leading-relaxed">
+                            Producteur de miel artisanal depuis 2010. Des miels naturels, non chauffés et non
+                            agités, issus de nos ruches en Seine-et-Marne.
                         </p>
                     </div>
 
-                    {/* Navigation Rapide */}
+                    {/* Navigation */}
                     <div>
-                        <h3 className="text-lg font-semibold text-orange-200 mb-6">Navigation</h3>
-                        <ul className="space-y-4">
-                            {["ACCUEIL", "PROPOS", "MIELS", "TRAVAIL", "GALERIE"].map((item) => (
-                                <li key={item}>
+                        <h3 className="font-serif text-lg text-honey-light mb-5">Navigation</h3>
+                        <ul className="space-y-3">
+                            {NAV_LINKS.map((item) => (
+                                <li key={item.label}>
                                     <Link
-                                        href={
-                                            item === "ACCUEIL"
-                                                ? "/"
-                                                : item === "GALERIE"
-                                                    ? `/${item.toLowerCase()}`
-                                                    : `#${item.toLowerCase()}`
-                                        }
-                                        className="text-white/60 hover:text-orange-200 transition-colors text-sm"
+                                        href={item.href}
+                                        className="text-cream/60 hover:text-honey-light transition-colors text-sm"
                                     >
-                                        {item}
+                                        {item.label}
                                     </Link>
                                 </li>
                             ))}
@@ -53,77 +52,81 @@ export default function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h3 className="text-lg font-semibold text-orange-200 mb-6">Contact</h3>
+                        <h3 className="font-serif text-lg text-honey-light mb-5">Contact</h3>
                         <ul className="space-y-4">
                             <li>
                                 <a
-                                    href="tel:0680369887"
-                                    className="flex items-center space-x-3 text-white/60 hover:text-orange-200 transition-colors text-sm group"
+                                    href="tel:+33680369887"
+                                    className="flex items-center gap-3 text-cream/60 hover:text-honey-light transition-colors text-sm group"
                                 >
-                                    <Phone className="w-4 h-4 text-orange-200 group-hover:scale-110 transition-transform" />
+                                    <Phone className="w-4 h-4 text-honey flex-shrink-0 group-hover:scale-110 transition-transform" />
                                     <span>06 80 36 98 87</span>
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="mailto:michel.clarion@hotmail.fr"
-                                    className="flex items-center space-x-3 text-white/60 hover:text-orange-200 transition-colors text-sm group"
+                                    className="flex items-center gap-3 text-cream/60 hover:text-honey-light transition-colors text-sm group"
                                 >
-                                    <Mail className="w-4 h-4 text-orange-200 group-hover:scale-110 transition-transform" />
-                                    <span>michel.clarion@hotmail.fr</span>
+                                    <Mail className="w-4 h-4 text-honey flex-shrink-0 group-hover:scale-110 transition-transform" />
+                                    <span className="break-all">michel.clarion@hotmail.fr</span>
                                 </a>
                             </li>
-                            <li className="flex items-center space-x-3 text-white/60 text-sm">
-                                <MapPin className="w-4 h-4 text-orange-200" />
+                            <li className="flex items-start gap-3 text-cream/60 text-sm">
+                                <MapPin className="w-4 h-4 text-honey flex-shrink-0 mt-0.5" />
                                 <span>
-                  151 rue des Hauldres <br /> Moissy-Cramayel (77550)
-                </span>
+                                    151 rue des Hauldres
+                                    <br />
+                                    77550 Moissy-Cramayel
+                                </span>
                             </li>
                         </ul>
                     </div>
 
-                    {/* Réseaux Sociaux */}
+                    {/* Réseaux sociaux */}
                     <div>
-                        <h3 className="text-lg font-semibold text-orange-200 mb-6">Suivez-nous</h3>
-                        <div className="flex space-x-4">
+                        <h3 className="font-serif text-lg text-honey-light mb-5">Suivez-nous</h3>
+                        <div className="flex gap-3">
                             <a
                                 href="https://fr-fr.facebook.com/people/Michel-Clarion/pfbid0hMcL7wnptxbnqCBd89BCm2roDCmPMrv82DA4DBpezLaqCdSJ8SfrWmptWLrPrb94l/"
                                 target="_blank"
-                                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-200 transition-colors group"
+                                rel="noopener noreferrer"
+                                aria-label="Suivez-nous sur Facebook"
+                                className="w-11 h-11 rounded-full bg-cream/10 flex items-center justify-center hover:bg-honey transition-colors group"
                             >
-                                <Facebook className="w-5 h-5 text-white/60 group-hover:text-black transition-colors" />
+                                <Facebook className="w-5 h-5 text-cream/70 group-hover:text-cream transition-colors" />
                             </a>
                             <a
                                 href="https://api.whatsapp.com/send/?phone=33680369887&text&type=phone_number&app_absent=0"
                                 target="_blank"
-                                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-orange-200 transition-colors group"
+                                rel="noopener noreferrer"
+                                aria-label="Nous écrire sur WhatsApp"
+                                className="w-11 h-11 rounded-full bg-cream/10 flex items-center justify-center hover:bg-honey transition-colors group"
                             >
-                                <PhoneForwarded className="w-5 h-5 text-white/60 group-hover:text-black transition-colors" />
+                                <MessageCircle className="w-5 h-5 text-cream/70 group-hover:text-cream transition-colors" />
                             </a>
                         </div>
-                        <div className="mt-6">
-                            <p className="text-white/60 text-sm">
-                                Inscrivez-vous à notre newsletter pour suivre nos actualités
-                            </p>
-                        </div>
+                        <p className="mt-5 text-cream/60 text-sm leading-relaxed">
+                            Commandes à retirer au rucher, sur rendez-vous.
+                        </p>
                     </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-white/10">
-                    <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <p className="text-white/40 text-sm">
+                <div className="mt-14 pt-8 border-t border-cream/10">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-cream/40 text-sm">
                             © {new Date().getFullYear()} Rucher des Hauldres. Tous droits réservés.
                         </p>
-                        <div className="flex space-x-6">
+                        <div className="flex gap-6">
                             <Link
                                 href="/mentions-legales"
-                                className="text-white/40 hover:text-orange-200 transition-colors text-sm"
+                                className="text-cream/40 hover:text-honey-light transition-colors text-sm"
                             >
                                 Mentions légales
                             </Link>
                             <Link
                                 href="/politique-de-confidentialite"
-                                className="text-white/40 hover:text-orange-200 transition-colors text-sm"
+                                className="text-cream/40 hover:text-honey-light transition-colors text-sm"
                             >
                                 Politique de confidentialité
                             </Link>
